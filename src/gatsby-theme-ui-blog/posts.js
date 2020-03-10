@@ -30,17 +30,17 @@ export default ({ posts, ...props }) => {
         <Avatar width={26} mx={10} src={logo}/>
         <Text mx={10}>{title}</Text>
       </div>
-
-      <ul
+      <Styled.ul
         sx={{
           listStyle: 'none',
           display: 'grid',
-          // gridGap: 69,
-          // gridTemplateColumns: 'repeat(2, minmax(10px, 460px))',
+          paddingLeft: 0,
+          gridGap: 66,
+          gridTemplateColumns: 'repeat(1, 1fr)',
         }}>
         {posts.map(post => (
           <li key={post.id}>
-            <Box p={0}>
+            <Box my={0}>
             {/* {post.coverUrl && <AspectImage ratio={8/3} src={post.coverUrl} />} */}
             <Styled.h3
               sx={{
@@ -62,7 +62,7 @@ export default ({ posts, ...props }) => {
             </Box>
           </li>
         ))}
-      </ul>
+      </Styled.ul>
       </Container>
     </Layout>
   </Styled.root>

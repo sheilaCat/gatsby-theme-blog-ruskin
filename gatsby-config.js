@@ -86,6 +86,16 @@ module.exports = {
           }
         ]
       }
+    },
+    {
+      resolve: "gatsby-plugin-page-progress",
+      options: {
+        includePaths: ["/", { regex: "^/" }],
+        // excludePaths: ["/blog/beep-beep-lettuce"],
+        height: 3,
+        prependToBody: false,
+        color: `#663399`
+      }
     }
   ],
 }

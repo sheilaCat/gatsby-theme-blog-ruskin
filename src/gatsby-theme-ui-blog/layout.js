@@ -29,12 +29,13 @@ const Footer = () => {
   return (
     <>
     <Divider />
-    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-    <span id="busuanzi_container_site_uv">
-      本站访客数<span id="busuanzi_value_site_uv"></span>人次
-    </span>
-    <div>© sheilaCat 2019-2020</div>
+    <Flex sx={{justifyContent: 'space-between'}}>
+      <div>© sheilaCat 2019-2020</div>
+      {/* <span id="busuanzi_container_site_uv">
+        view counts <span id="busuanzi_value_site_uv">1</span>
+      </span> */}
+      <div>powered by gatsby · themed by ruskin</div>
+    </Flex>
     </>
   )
 }
@@ -45,7 +46,7 @@ const Header = () => {
       <header>
         <Flex>
         <Box p={2} bg='transparent' sx={{ flex: '1 1 auto' }}>
-          <WriteDarkSVG/>
+        <Button bg='transparent'><Link to="/"><WriteDarkSVG/></Link></Button>
         </Box>
         <Box p={2} bg='transparent'>
         <DarkModeButton />
@@ -74,7 +75,8 @@ const {googleAnalyticsUA} = data.site.siteMetadata;
   <>
     <Head {...props} />
     <Container 
-    // px={600} py={50}
+      px={[3,5,'20%']}
+      py={[1,1,'4%']}
     >
       <Header />
       {props.children}
