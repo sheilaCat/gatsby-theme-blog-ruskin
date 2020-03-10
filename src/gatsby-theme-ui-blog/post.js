@@ -2,7 +2,7 @@
 import { jsx, Styled, Container, Avatar, Text, Box } from 'theme-ui'
 import { Layout } from 'gatsby-theme-ui-layout'
 import logo from "../../content/assets/avatar.png";
-import ViewEyeSVG from '../../content/assets/view-eye.svg'
+import ColoredSvg from './colored-svg';
 
 export default ({
   title,
@@ -21,12 +21,10 @@ export default ({
           <Avatar width={26} mx={10} src={logo}/>
           <Text mx={10}>sheila.cat</Text>
           <div>{date}</div>
-
           <Text id="busuanzi_container_page_pv" mx={20} sx={{display: 'flex!important', justifyContent: 'center', alignItems: 'center'}}>
-            <ViewEyeSVG width={20} height={20}/>
+            <ColoredSvg name="eye" width={20} height={20}/>
             <span sx={{lineHeight: '26px', marginLeft: '4px'}} id="busuanzi_value_page_pv"></span>
           </Text>
-
         </div>
         {children}
 

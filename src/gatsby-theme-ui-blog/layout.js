@@ -6,10 +6,7 @@ import { jsx, useColorMode, Button, Flex, Box, Divider, Container } from 'theme-
 import React from 'react'
 import { Link, useStaticQuery, graphql } from 'gatsby'
 import Head from './head'
-
-import DarkModeSVG from '../../content/assets/dark-mode.svg'
-import LightModeSVG from '../../content/assets/light-mode.svg'
-import WriteDarkSVG from '../../content/assets/write-dark.svg'
+import ColoredSVG from './colored-svg'
 
 const DarkModeButton = () => {
   const [colorMode, setColorMode] = useColorMode()
@@ -20,8 +17,8 @@ const DarkModeButton = () => {
       onClick={e => {
         setColorMode(colorMode === 'default' ? 'dark' : 'default')
       }}>
-      {colorMode === 'default' ? <DarkModeSVG /> : <LightModeSVG />}
-  </Button>
+      <ColoredSVG name="mode"/>
+    </Button>
   )
 }
 
@@ -46,7 +43,9 @@ const Header = () => {
       <header>
         <Flex>
         <Box p={2} bg='transparent' sx={{ flex: '1 1 auto' }}>
-        <Button bg='transparent'><Link to="/"><WriteDarkSVG/></Link></Button>
+        <Button bg='transparent'><Link to="/">
+          <ColoredSVG name="home"/>
+        </Link></Button>
         </Box>
         <Box p={2} bg='transparent'>
         <DarkModeButton />
@@ -82,7 +81,7 @@ const {googleAnalyticsUA} = data.site.siteMetadata;
       {props.children}
       <Footer/>
     </Container>
-        {/* <!-- Google Analytics --> */}
+      {/* <!-- Google Analytics --> */}
     <script
       dangerouslySetInnerHTML={{
         __html: `
