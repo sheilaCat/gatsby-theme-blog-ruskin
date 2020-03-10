@@ -21,7 +21,7 @@ export default ({ posts, ...props }) => {
 
   return (
   <Styled.root>
-    <Layout {...props}>
+    <Layout {...props} title={title} description={description}>
     <Container>
       <Box py={40}>
         <Styled.h1>{description}</Styled.h1>
@@ -35,8 +35,8 @@ export default ({ posts, ...props }) => {
         sx={{
           listStyle: 'none',
           display: 'grid',
-          gridGap: 69,
-          gridTemplateColumns: 'repeat(2, minmax(10px, 460px))',
+          // gridGap: 69,
+          // gridTemplateColumns: 'repeat(2, minmax(10px, 460px))',
         }}>
         {posts.map(post => (
           <li key={post.id}>

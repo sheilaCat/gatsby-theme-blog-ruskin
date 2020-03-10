@@ -13,7 +13,7 @@ export default ({
   ...props
 }) => (
   <Styled.root>
-    <Layout title={title} excerpt={excerpt} {...props}>
+    <Layout title={title} description={excerpt} {...props}>
       <Container >
         <Styled.h1>{title}</Styled.h1>
         <div style={{display:'flex', flexDirection: 'row', alignItems: 'center'}}>
@@ -29,15 +29,23 @@ export default ({
 
         </div>
         {children}
-        <script
-          src="https://utteranc.es/client.js"
-          repo="https://github.com/sheilaCat/blog"
-          issue-term="title"
-          label="comment"
-          theme="github-light"
-          crossOrigin="anonymous"
-          async>
-        </script>
+
+        <div
+          key={`comment`}
+          id="___comment"
+          dangerouslySetInnerHTML={{ __html: `
+            <script
+            src="https://utteranc.es/client.js"
+            repo="sheilaCat/sheilacat.github.io"
+            issue-term="title"
+            label="comment"
+            theme="github-light"
+            crossOrigin="anonymous"
+            async>
+          </script>
+        `}}
+        />
+
       </Container>
     </Layout>
   </Styled.root>

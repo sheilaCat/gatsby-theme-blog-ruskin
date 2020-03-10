@@ -4,7 +4,7 @@
 import { jsx, useColorMode, Button, Flex, Box, Divider, Container } from 'theme-ui'
 
 import React from 'react'
-import { Link } from 'gatsby'
+import { Link, useStaticQuery, graphql } from 'gatsby'
 import Head from './head'
 
 import DarkModeSVG from '../../content/assets/dark-mode.svg'
@@ -57,13 +57,42 @@ const Header = () => {
 }
 
 export default props => {
+
+  const data = useStaticQuery(graphql`
+    query GoogleUA {
+      site {
+        siteMetadata {
+          googleAnalyticsUA
+        }
+      }
+    }
+  `)
+
+const {googleAnalyticsUA} = data.site.siteMetadata;
+
   return (
   <>
     <Head {...props} />
-    <Container px={600} py={50}>
+    <Container 
+    // px={600} py={50}
+    >
       <Header />
       {props.children}
       <Footer/>
     </Container>
+        {/* <!-- Google Analytics --> */}
+    <script
+      dangerouslySetInnerHTML={{
+        __html: `
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', '${googleAnalyticsUA}', 'auto');
+        ga('send', 'pageview');`,
+      }}
+      />
+    {/* <!-- End Google Analytics --> */}
   </>
 )}
