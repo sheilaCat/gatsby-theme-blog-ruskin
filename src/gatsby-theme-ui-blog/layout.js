@@ -1,12 +1,14 @@
 
 
 /** @jsx jsx */
-import { jsx, useColorMode, Button, Flex, Box, Divider, Container } from 'theme-ui'
+import { jsx, useColorMode, Button, Flex, Box, Divider, Container, NavLink } from 'theme-ui'
 
 import React from 'react'
 import { Link, useStaticQuery, graphql } from 'gatsby'
 import Head from './head'
 import ColoredSVG from './colored-svg'
+
+import Profile from './profile'
 
 const DarkModeButton = () => {
   const [colorMode, setColorMode] = useColorMode()
@@ -72,8 +74,10 @@ const {googleAnalyticsUA} = data.site.siteMetadata;
 
   return (
   <>
+    <Profile/>
     <Head {...props} />
     <Container 
+      // backgroundColor="muted"
       px={[3,5,'20%']}
       py={[1,1,'4%']}
     >

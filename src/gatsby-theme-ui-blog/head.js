@@ -17,5 +17,6 @@ export default ({ lang = 'en-us', title, description, ...props }) => {
     <meta name="title" content={title} />
     <meta name="description" content={description} />
     <meta property="og:title" content={title} />
+    <script src="https://cdn.jsdelivr.net/npm/echarts@4.7.0/dist/echarts.min.js"></script>
   </Helmet>
 )}

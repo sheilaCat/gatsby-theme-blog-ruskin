@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, Styled, Container, Avatar, Text, Box } from 'theme-ui'
+import { jsx, Styled, Container, Avatar, Text, Box, useThemeUI } from 'theme-ui'
 import { Layout } from 'gatsby-theme-ui-layout'
 import logo from "../../content/assets/avatar.png";
 import ColoredSvg from './colored-svg';
@@ -12,7 +12,33 @@ export default ({
   keywords,
   tags,
   ...props
-}) => (
+}) => {
+  
+  const context = useThemeUI()
+  const { colorMode } = context
+
+  setTimeout(() => {
+    document.getElementById('___comment').innerHTML = `
+    <script
+    src="https://utteranc.es/client.js"
+    repo="sheilaCat/sheilacat.github.io"
+    issue-term="pathname"
+    label="comment"
+    theme="github-light"
+    crossOrigin="anonymous"
+    SameSite="None"
+    >
+  </script>
+  <script 
+    SameSite="None"
+    id="busuanzi" 
+    defer
+    src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"
+  />
+`
+  }, 1000)
+
+  return (
   <Styled.root>
     <Layout title={title} description={excerpt} {...props}>
       <Container>
@@ -31,28 +57,9 @@ export default ({
         <div
           key={`comment`}
           id="___comment"
-          dangerouslySetInnerHTML={{ __html: `
-            <script
-            src="https://utteranc.es/client.js"
-            repo="sheilaCat/sheilacat.github.io"
-            issue-term="pathname"
-            label="comment"
-            theme="github-light"
-            crossOrigin="anonymous"
-            async
-            SameSite="None"
-            >
-          </script>
-          <script 
-            SameSite="None"
-            id={"busuanzi"} 
-            defer
-            src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"
-          />
-        `}}
         />
 
       </Container>
     </Layout>
   </Styled.root>
-)
+)}
