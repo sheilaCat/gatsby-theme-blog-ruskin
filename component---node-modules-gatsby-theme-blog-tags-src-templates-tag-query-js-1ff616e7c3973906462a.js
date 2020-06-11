@@ -1,2 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[4],{Lmuq:function(n,e,r){"use strict";r.r(e);var t=r("q1tI"),u=r.n(t);r.d(e,"query",(function(){return i}));e.default=function(n){return u.a.createElement("pre",null,JSON.stringify(n,null,2))};var i="2100030568"}}]);
-//# sourceMappingURL=component---node-modules-gatsby-theme-blog-tags-src-templates-tag-query-js-1ff616e7c3973906462a.js.map
