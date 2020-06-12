@@ -1,9 +1,7 @@
 /** @jsx jsx */
-import { jsx, Styled, Box, Container, AspectImage, Avatar, Text} from 'theme-ui'
+import { jsx, Styled, Box, Container, AspectImage, Avatar, Text, Image} from 'theme-ui'
 import { Link, useStaticQuery, graphql } from 'gatsby'
 import { Layout } from 'gatsby-theme-ui-layout'
-
-import logo from "../../content/assets/avatar.png";
 
 export default ({ posts, ...props }) => {
   const data = useStaticQuery(graphql`
@@ -17,30 +15,33 @@ export default ({ posts, ...props }) => {
     }
   `)
 
-  const {description, title} = data.site.siteMetadata;
+  const {description, title,} = data.site.siteMetadata;
 
   return (
   <Styled.root>
     <Layout {...props} title={title} description={description}>
     <Container>
-      <Box py={40}>
+    {/* <Image
+      src={'https://cdn.pixabay.com/photo/2020/05/17/20/21/cat-5183427_1280.jpg'}
+    /> */}
+
+      {/* <Box py={20}>
         <Styled.h1>{description}</Styled.h1>
-      </Box>
-      <div style={{display:'flex', flexDirection: 'row', alignItems: 'center'}}>
-        <Avatar width={26} mx={10} src={logo}/>
-        <Text mx={10}>{title}</Text>
-      </div>
+      </Box> */}
       <Styled.ul
         sx={{
           listStyle: 'none',
           display: 'grid',
           paddingLeft: 0,
-          gridGap: 66,
+          // gridGap: 30,
           gridTemplateColumns: 'repeat(1, 1fr)',
         }}>
         {posts.map(post => (
           <li key={post.id}>
-            <Box my={0}>
+            <Box m={0} pb={20}>
+            {/* <Image
+              src={(post.frontmatter && post.frontmatter.image) || ''}
+            />  */}
             {/* {post.coverUrl && <AspectImage ratio={8/3} src={post.coverUrl} />} */}
             <Styled.h3
               sx={{
@@ -59,6 +60,7 @@ export default ({ posts, ...props }) => {
               </Link>
             </Styled.h3>
             <small sx={{ fontWeight: 'bold' }}>{post.date}</small>
+              <Text>{post.excerpt}</Text>
             </Box>
           </li>
         ))}

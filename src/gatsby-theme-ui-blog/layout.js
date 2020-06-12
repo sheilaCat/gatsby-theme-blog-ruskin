@@ -1,7 +1,7 @@
 
 
 /** @jsx jsx */
-import { jsx, useColorMode, Button, Flex, Box, Divider, Container, NavLink } from 'theme-ui'
+import { jsx, useColorMode, Button, Flex, Box, Divider, Container, NavLink, Text, Styled, Image } from 'theme-ui'
 
 import React from 'react'
 import { Link, useStaticQuery, graphql } from 'gatsby'
@@ -27,23 +27,22 @@ const DarkModeButton = () => {
 const Footer = () => {
   return (
     <>
-    <Divider />
-    <Flex sx={{justifyContent: 'space-between'}}>
-      <div>© sheilaCat 2019-2020</div>
-      {/* <span id="busuanzi_container_site_uv">
-        view counts <span id="busuanzi_value_site_uv">1</span>
-      </span> */}
+    <Flex sx={{justifyContent: 'space-between', fontWeight: 'bold'}}>
+      <div sx={{display: ['none', 'none', 'block']}}>© sheila.cat 2020</div>
+      <span sx={{display: ['none', 'none', 'block']}} id="busuanzi_container_site_uv">
+        view counts <span id="busuanzi_value_site_uv">--</span>
+      </span>
       <div>powered by gatsby · themed by ruskin</div>
     </Flex>
     </>
   )
 }
 
-const Header = () => {
+const Header = ({description}) => {
   return (
     <>
       <header>
-        <Flex>
+        {/* <Flex>
         <Box p={2} bg='transparent' sx={{ flex: '1 1 auto' }}>
         <Button bg='transparent'><Link to="/">
           <ColoredSVG name="home"/>
@@ -52,7 +51,29 @@ const Header = () => {
         <Box p={2} bg='transparent'>
         <DarkModeButton />
         </Box>
-      </Flex>
+      </Flex> */}
+      <Box 
+        bg="navBg"
+        px={20}
+       sx={{position: ['relative', 'relative', 'fixed'], top: 0, left: 0, bottom: 0, minWidth: 240, background: '' }}
+       >
+ 
+         <div sx={{position: 'relative', top: '80%'}}>
+         <Text sx={{color: 'background', fontSize: 6, fontStyle: 'italic', fontWeight: '700'}}>{description}</Text>
+        <Flex as='nav'>
+          <NavLink color="background" href='/' p={2}>
+            Home
+          </NavLink>
+          <NavLink color="background"  href='/tags' p={2}>
+          Tags
+          </NavLink>
+          <NavLink color="background"  href='/books-gallery' p={2}>
+          Books
+          </NavLink>
+        </Flex>
+        <DarkModeButton />
+         </div>
+      </Box>
       </header>
     </>
   )
@@ -64,24 +85,25 @@ export default props => {
     query GoogleUA {
       site {
         siteMetadata {
-          googleAnalyticsUA
+          googleAnalyticsUA,
+          description
         }
       }
     }
   `)
 
-const {googleAnalyticsUA} = data.site.siteMetadata;
+const {googleAnalyticsUA, description} = data.site.siteMetadata;
 
   return (
   <>
-    <Profile/>
+    {/* <Profile/> */}
     <Head {...props} />
+    <Header description={description}/>
     <Container 
       // backgroundColor="muted"
-      px={[3,5,'20%']}
-      py={[1,1,'4%']}
+      px={[3,5,'30%']}
+      py={[1,1,'1%']}
     >
-      <Header />
       {props.children}
       <Footer/>
     </Container>

@@ -25,7 +25,7 @@ export default props => {
           <Grid columns={1} gap={2}>
           {
             list.map(item => (
-              <Box>
+              <Box bg='muted' sx={{borderRadius: 10}} m={0} p={20}>
                 <Text>{item.node.title}</Text>
               </Box>
             ))

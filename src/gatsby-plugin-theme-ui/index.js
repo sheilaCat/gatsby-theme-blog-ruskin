@@ -1,26 +1,31 @@
 // example theme
-import { swiss } from '@theme-ui/presets'
+import future from '@theme-ui/preset-tosh'
 // customize css style for your site
 
+import nightOwl from '@theme-ui/prism/presets/night-owl-light.json'
+
 export default {
-  ...swiss,
   fontSizes: [12, 14, 16, 20, 20, 24, 32, 48, 64],
-  // fonts: {
-  //   body:  "\"Noto Sans SC\", sans-serif",
-  //   heading: "inherit",
-  //   monospace: "Menlo, monospace"
-  // },
+  fonts: {
+    // body: "\"Cereal\",-apple-system,BlinkMacSystemFont,Arial,sans-serif",
+    // body: "\"Noto Serif SC\",  sans-serif",
+    heading: "inherit",
+    monospace: "Menlo, monospace"
+  },
   colors: {
-    text: "hsl(10, 20%, 20%)",
-    background: "hsl(10, 10%, 98%)",
-    primary: "hsl(10, 80%, 50%)",
-    secondary: "hsl(10, 60%, 50%)",
-    highlight: "hsl(10, 40%, 90%)",
-    purple: "hsl(250, 60%, 30%)",
-    muted: "hsl(10, 20%, 94%)",
-    gray: "hsl(10, 20%, 50%)",
+    text: '#454f5b',
+    background: '#fff',
+    primary: '#5c6ac4',
+    secondary: '#006fbb',
+    highlight: '#47c1bf',
+    muted: '#e6e6e6',
+    gray: '#dfe3e8',
+    accent: '#f49342',
+    darken: '#00044c',
+    navBg: '#202020',
     modes: {
       dark: {
+        navBg: '#63638a',
         text: 'hsl(210, 50%, 96%)',
         background: 'hsl(230, 25%, 18%)',
         primary: 'hsl(260, 100%, 80%)',
@@ -38,12 +43,12 @@ export default {
     "display": 900
   },
   "lineHeights": {
-    "body": 1.5,
+    "body": 2,
     "heading": 1.25
   },
   "textStyles": {
     "heading": {
-      "fontFamily":  "\"Noto Serif SC\", serif" // 标题有衬线
+      // "fontFamily":  "\"Noto Serif SC\", serif" // 标题有衬线
     },
     "display": {
       "variant": "textStyles.heading",
@@ -71,7 +76,7 @@ export default {
     },
     "h2": {
       "variant": "textStyles.heading",
-      "fontSize": 5
+      "fontSize": [5,6]
     },
     "h3": {
       "variant": "textStyles.heading",
@@ -98,7 +103,7 @@ export default {
     "pre": {
       "variant": "prism",
       "fontFamily": "monospace",
-      "fontSize": 1,
+      "fontSize": 2,
       "p": 3,
       "color": "text",
       "bg": "muted",
@@ -106,16 +111,6 @@ export default {
       "code": {
         "color": "inherit"
       }
-    },
-    "code": {
-      "fontFamily": "monospace",
-      "color": "secondary",
-      "fontSize": 1
-    },
-    "inlineCode": {
-      "fontFamily": "monospace",
-      "color": "secondary",
-      "bg": "muted"
     },
     "table": {
       "width": "100%",
@@ -146,23 +141,27 @@ export default {
     },
     "img": {
       "maxWidth": "100%"
+    },
+    code: {
+      fontFamily: 'monospace',
+      fontSize: 1
+    },
+    inlineCode: {
+      fontFamily: 'monospace',
+      color: 'secondary',
+      bg: 'muted',
+      px: 2
+    },
+  },
+  links: {
+    nav: {
+      px: 2,
+      py: 1,
+      // textTransform: 'uppercase',
+      letterSpacing: '0.2em',
     }
   },
   "prism": {
-    ".comment,.prolog,.doctype,.cdata,.punctuation,.operator,.entity,.url": {
-      "color": "gray"
-    },
-    ".comment": {
-      "fontStyle": "italic"
-    },
-    ".property,.tag,.boolean,.number,.constant,.symbol,.deleted,.function,.class-name,.regex,.important,.variable": {
-      "color": "purple"
-    },
-    ".atrule,.attr-value,.keyword": {
-      "color": "primary"
-    },
-    ".selector,.attr-name,.string,.char,.builtin,.inserted": {
-      "color": "secondary"
-    }
+    ...nightOwl,
   }
 }

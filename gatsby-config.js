@@ -1,11 +1,12 @@
 module.exports = {
   pathPrefix: "/gatsby-theme-blog-ruskin",
   siteMetadata: {
-    title: `sheilaCat's Blog`,
+    title: `sheila.cat的博客`,
     author: `sheilaCat`,
     siteUrl: `https://sheilacat.github.io`,
+    disqusName: 'sheila-cats-blog',
     googleAnalyticsUA: 'UA-66121951-1',
-    description: 'This world was never meant for one as beautiful as you.',
+    description: 'SHEILA.CAT',
     social: [
       {
         name: `Twitter`,

@@ -14,6 +14,7 @@
     "@theme-ui/presets": "^0.3.0",
     "@theme-ui/prism": "^0.3.0",
     "@theme-ui/typography": "^0.3.0",
+    "disqus-react": "^1.0.8",
     "gatsby": "^2.19.7",
     "gatsby-plugin-feed-mdx": "^1.0.1",
     "gatsby-plugin-page-progress": "^2.0.16",

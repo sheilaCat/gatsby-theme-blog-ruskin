@@ -1,0 +1,510 @@
+---
+title: 从Mixins到HOC再到React Hooks
+date: 2020-04-15
+tags: ['react', 'hooks']
+---
+
+## 引言
+
+我们都知道在业务开发的过程中，如果完全不同的组件有相似的功能，这就会产生`横切关注点（cross-cutting concerns）`问题。
+
+在React中，存在一些最佳实践去处理横切关注点的问题，可以帮助我们更好地进行代码的逻辑复用。
+
+## Mixin
+
+针对这个问题，在使用`createReactClass`创建 React 组件的时候，引入 mixins 功能会是一个很好的解决方案。
+
+为了在初始阶段更加容易地适应和学习React，官方在 React 中包含了一些急救方案。mixin 系统是其中之一。
+
+所以我们可以将通用共享的方法包装成Mixins方法，然后注入各个组件进行逻辑复用的实现。
+
+### 原理
+
+```
+const mixin = function(obj, mixins) {
+  const newObj = obj;
+  newObj.prototype = Object.create(obj.prototype);
+  for (let prop in mixins) {
+    if (mixins.hasOwnProperty(prop)) {
+      newObj.prototype\[prop\] = mixins\[prop\];
+    }
+  }
+  return newObj;
+}
+```
+
+上述代码就实现了一个简单的mixin函数，其实质就是将mixins中的方法遍历赋值给`newObj.prototype`，从而实现mixin返回的函数创建的对象都有mixins中的方法，也就是把额外的功能都混入进去。
+
+在我们大致明白了mixin作用后，让我们来看看如何在React使用mixin。
+
+### 应用
+
+```
+var RowMixin = {
+  renderHeader: function() {
+    return (
+      <div className='row-header'>
+        <h1>
+          {this.getHeaderText()}
+        </h1>
+      </div>
+    );
+  }
+};
+
+var UserRow = React.createClass({
+  mixins: \[RowMixin\], // 混入renderHeader方法
+  getHeaderText: function() {
+    return this.props.user.fullName;
+  },
+  render: function() {
+    return (
+      <div>
+        {this.renderHeader()}
+        <h2>{this.props.user.biography}</h2>
+      </div>
+    )
+  }
+}); 
+
+```
+
+使用`React.createClass`，官方提供了mixins的接入口。需要复用的代码逻辑从这里混入就可以。
+
+这是ES5的写法，实际上React16版本后就已经废弃了。
+
+ES6 本身是不包含任何 mixin 支持。因此，当你在 React 中使用 ES6 class 时，将不支持 mixins 。
+
+官方也发现了很多使用 mixins 然后出现了问题的代码库。并且不建议在新代码中使用它们。
+
+### 缺点
+
+#### Mixins Considered Harmful
+
+- Mixins 引入了隐式的依赖关系（Mixins introduce implicit dependencies）
+    
+- Mixins 引起名称冲突（Mixins cause name clashes）
+    
+- Mixins 导致滚雪球式的复杂性（Mixins cause snowballing complexity）
+    
+
+引自官方博客： [https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html)
+
+官方博客里面有一篇文章详细描述了弃用的原因。里面列举了三条罪状，如上所述。
+
+在实际开发的过程中，我们无法预知别人往代码里mixin了什么属性和状态。如果想要mixin自己的功能，可能会发生冲突，甚至需要去解耦之前的代码。
+
+这样的方式同时也破坏了组件的封装性，代码之间的依赖是不可见的，给重构代码也带来了一定的难度。如果对组件进行修改，很可能会导致mixin方法错误或者失效。
+
+在往后的开发维护过程中，就导致了滚雪球式的复杂性。
+
+#### 名称冲突
+
+组件中含有多个mixin——
+
+- 不同的mixin中含有相同名字的非生命周期函数，React会抛出异常(不是后面的函数覆盖前面的函>数)。
+    
+- 不同的mixin中含有相同名字的生命周期函数，不会抛出异常，mixin中的相同的生命周期函数(除render方法)会按照createClass中传入的mixins数组顺序依次调用，全部调用结束后再调用组件内部的相同的声明周期函数。
+    
+- 不同的mixin中默认props或初始state中存在相同的key值时，React会抛出异常。
+    
+
+mixin里面对不同情况名称冲突的处理，只有当相同名称的生命周期函数，才会按照声明的顺序调用，最后调用组件内部的同名函数。其他情况下都会抛出异常。
+
+mixin这种混入模式，会给组件不断增加新的方法和属性，组件本身不仅可以感知，甚至需要做相关的处理(例如命名冲突、状态维护)，一旦混入的模块变多时，整个组件就变的难以维护，也就是为什么如此多的React库都采用高阶组件的方式进行开发。
+
+## HOC
+
+在mixin废弃后，很多开源组件库都是使用的高阶组件写法。
+
+高阶组件属于函数式编程(functional programming)思想。
+
+对于被包裹的组件时不会感知到高阶组件的存在，而高阶组件返回的组件会在原来的组件之上具有功能增强的效果。
+
+### 高阶函数
+
+说到高阶组件，先要说一下高阶函数的定义。
+
+在数学和计算机科学中，高阶函数是至少满足下列一个条件的函数：
+
+- 接受一个或多个函数作为输入
+    
+- 输出一个函数
+    
+
+简单地来说，高阶函数就是接受函数作为输入或者输出的函数。
+
+const add = (x,y,f) => f(x)+f(y);
+add(\-5, 6, Math.abs);
+
+### 高阶组件
+
+> A higher-order component is a function that takes a component and returns a new component.
+
+高阶组件是一个接受组件并且返回新组件的函数，注意虽然名字叫高阶组件但它自身是一个函数，它可以增强它所包裹的组件功能，或者说赋予了它所包裹的组件一个新的功能。
+
+它不是React API的一部分，源自于React生态，是官方推崇的复用组合的一种方式。它对应着设计模式中的装饰者模式。
+
+高阶组件，主要有两种方式处理包裹组件的方式，分别是属性代理和反向继承。
+
+### 属性代理(Props Proxy)
+
+实质上是通过包裹原来的组件来操作props
+
+- 操作props
+    
+- 获得refs引用
+    
+- 抽象state
+    
+- 用其他元素包裹组件
+    
+```
+export default function withHeader(WrappedComponent) {
+  return class HOC extends Component {
+    render() {
+      const newProps = {
+        test:'hoc'
+      }
+      // 透传props，并且传递新的newProps
+      return <div>
+        <WrappedComponent {...this.props} {...newProps}/>
+      </div>
+    }
+  }
+}
+```
+属性代理，实际上是通过包裹原来的组件，来注入一些额外的props或者state。
+
+为了增强可维护性，有一些固有的约定，比如命名高阶组件的时候需要使用`withSomething`的格式。
+
+对于传入的props最好直接透传，不要破坏组件本身的属性和状态。
+
+### 反向继承(Inheritance Inversion)
+
+- 渲染劫持
+    
+- 操作props和state
+    
+```
+export default function (WrappedComponent) {
+  return class Inheritance extends WrappedComponent {
+    componentDidMount() {
+      // 可以方便地得到state，做一些更深入的修改。
+      console.log(this.state);
+    }
+    render() {
+      return super.render();
+    }
+  }
+}
+```
+反向继承可以通过`super`关键字获取到父类原型对象上的所有方法（父类实例上的属性或方法则无法获取）。在这种方式中，它们的关系看上去被反转（inverse）了。
+
+反向继承可以劫持渲染，可以进行延迟渲染/条件渲染等操作。
+
+### 约定
+
+- 约定：将不相关的 props 传递给被包裹的组件
+    
+- 约定：包装显示名称以便轻松调试
+    
+- 约定：最大化可组合性
+    
+```
+// 而不是这样...
+const EnhancedComponent = withRouter(connect(commentSelector)(WrappedComponent))
+
+// ... 你可以编写组合工具函数
+// compose(f, g, h) 等同于 (...args) => f(g(h(...args)))
+const enhance = compose(
+  // 这些都是单参数的 HOC
+  withRouter,
+  connect(commentSelector)
+)
+const EnhancedComponent = enhance(WrappedComponent)
+```
+compose可以帮助我们组合任意个（包括0个）高阶函数，例如compose(a,b,c)返回一个新的函数d，函数d依然接受一个函数作为入参，只不过在内部会依次调用c,b,a，从表现层对使用者保持透明。  
+基于这个特性，我们便可以非常便捷地为某个组件增强或减弱其特征，只需要去变更compose函数里的参数个数即可。
+
+### 应用场景
+
+- 模块复用
+    
+- 页面鉴权
+    
+- 日志及性能打点
+    
+- …
+    
+
+### 例子
+```
+export const withTimer = (interval) => (wrappedComponent) => {
+
+  return class extends wrappedComponent {
+    constructor(props) {
+      super(props);
+    }
+    // 传入endTime 计算剩余时间戳
+    endTimeStamp = DateUtils.parseDate(this.props.endTime).getTime();
+
+    componentWillMount() {
+      // 未过期则手动调用计时器 开始倒计时
+      if (Date.now() < this.endTimeStamp) {
+        this.onTimeChange();
+        this.setState({expired: false});
+        this.\_\_timer = setInterval(this.onTimeChange, interval);
+      }
+    }
+
+    componentWillUnmount() {
+      // 清理计时器
+      clearInterval(this.\_\_timer);
+    }
+
+    onTimeChange = () => {
+      const now = Date.now();
+      // 根据剩余时间戳计算出 时、分、秒注入到目标组件
+      const ret = Helper.calc(now, this.endTimeStamp);
+      if (ret) {
+        this.setState(ret);
+      } else {
+        clearInterval(this.\_\_timer);
+        this.setState({expired: true});
+      }
+    }
+
+    render() {
+      // 反向继承
+      return super.render();
+    }
+  };
+};
+```
+
+```
+@withTimer()
+export class Card extends React.PureComponent {
+  render() {
+    const {data, endTime} = this.props;
+    // 直接取用�hoc注入的状态
+    const {expired, minute, second} = this.state;
+    // 略去render逻辑
+    return (...);
+  }
+}
+```
+需求是需要进行定时器倒计时，很多组件都需要注入倒计时功能。那么我们把它提取为一个高阶组件。
+
+这是一个反向继承的方式，可以拿到组件本身的属性和状态，然后把时分秒等状态注入到了组件中。
+
+原组件使用了ES7的装饰器语法，就可以加强它的功能。
+
+组件本身只需要有一个`endTime`的属性，然后高阶组件就可以计算出时分秒并且进行倒计时。
+
+也就是说，高阶组件赋予了原组件倒计时的功能。
+
+### 注意
+
+在使用高阶组件写法时，也有一些注意事项。
+
+- 不要在render函数中使用高阶组件
+```
+render() {
+  // 每次调用 render 函数都会创建一个新的 EnhancedComponent
+  // EnhancedComponent1 !== EnhancedComponent2
+  const EnhancedComponent = enhance(MyComponent);
+  // 这将导致子树每次渲染都会进行卸载，和重新挂载的操作！
+  return <EnhancedComponent />;
+}
+```
+如果在render函数中创建，每次都会重新渲染一个新的组件。这不仅仅是性能问题，每次重置该组件的状态，也可能会引起代码逻辑错误。
+
+- 静态方法必须复制
+```
+// 定义静态函数
+WrappedComponent.staticMethod = function() {/\*...\*/}
+// 现在使用 HOC
+const EnhancedComponent = enhance(WrappedComponent);
+
+// 增强组件没有 staticMethod
+typeof EnhancedComponent.staticMethod === 'undefined' // true
+```
+当你将 HOC 应用于组件时，原始组件将使用容器组件进行包装。这意味着新组件没有原始组件的任何静态方法。
+
+你可以使用`hoist-non-react-statics`自动拷贝所有非 React 静态方法:
+
+- Refs不会被传递
+
+一般来说，高阶组件可以传递所有的props属性给包裹的组件，但是不能传递 refs 引用。因为并不是像 key 一样，refs 是一个伪属性，React 对它进行了特殊处理。
+
+如果你向一个由高级组件创建的组件的元素添加 ref 应用，那么 ref 指向的是最外层容器组件实例的，而不是包裹组件。
+
+## React Hooks
+
+在不编写class的情况下使用state以及其他的React特性。
+
+Hook是一些可以让你在函数组件hook react state及生命周期等特性的函数。它不能在class组件中使用。
+
+### 动机
+
+- 在组件之间复用状态逻辑
+    
+    - render props
+        
+        任何被用于告知组件需要渲染什么内容的函数props在技术上都可以被成为称为`render prop`
+        
+        > 如果在render方法里创建匿名函数，那么使用render prop会抵消使用React.PureComponent带来的优势。  
+        > 需要把render方法创建为实例函数，或者作为全局变量传入。
+        
+    - hoc
+        
+    - providers
+        
+    - consumers
+        
+    
+    > 这些抽象层组成的组件会形成嵌套地狱，因此React需要为共享状态逻辑提供更好的原生途径。
+    
+- 增强代码可维护性
+    
+- class难以理解
+    
+
+React社区接受了React hooks的提案，这将减少编写 React 应用时需要考虑的概念数量。
+
+Hooks 可以使得你始终使用函数，而不必在函数、类、高阶组件和 reader props之间不断切换。
+
+### Hooks
+
+- 基础 Hook
+    
+    - useState
+        
+    - useEffect
+        
+        > 启用 eslint-plugin-react-hooks 中的 exhaustive-deps 规则。此规则会在添加错误依赖时发出警告并给出修复建议。
+        
+    - useContext
+        
+- 额外的 Hook
+    
+    - useReducer
+        
+    - useCallback
+        
+    - useMemo
+        
+    - useRef
+        
+    - useImperativeHandle
+        
+    - useLayoutEffect
+        
+    - useDebugValue
+        
+- 自定义Hook useSomething
+    
+    > 自定义Hook是一种重用状态逻辑的机制，所有的state和副作用都是完全隔离的。
+    
+
+官方已经弃用了一些生命周期，`useEffect`相当于`componentDidMount`，`componentDidUpdate` 和 `componentWillUnmount`。
+
+除了官方提供的Hook API以外，你可以使用自定义Hook。
+
+自定义 Hook 不需要具有特殊的标识。我们可以自由的决定它的参数是什么，以及它应该返回什么（如果需要的话）。
+
+换句话说，它就像一个正常的函数。但是它的名字应该始终以 `use` 开头，这样可以一眼看出其符合 Hook 的规则。
+
+动画、订阅声明、计时器是自定义Hook的一些常用操作。
+
+接下来，我们来用React Hook改写一下之前的高阶组件demo。
+
+### 例子
+```
+export function useTimer(endTime, interval, callback) {
+  interval = interval || 1000;
+  
+  // 使用useState Hook get/set状态
+  const \[expired, setExpired\] = useState(true);
+  const endTimeStamp = DateUtils.parseDate(endTime).getTime();
+
+  function \_onTimeChange () {
+    const now = Date.now();
+    // 计算时分秒
+    const ret = Helper.calc(now, endTimeStamp);
+    if (ret) {
+      // 回调传出所需的状态
+      callback({...ret, expired});
+    } else {
+      clearInterval(this.\_\_timer);
+      setExpired(true);
+      callback({expired});
+    }
+  }
+
+  // 使用useEffect代替生命周期的调用
+  useEffect(() => {
+    if (Date.now() < endTimeStamp) {
+      \_onTimeChange();
+      setExpired(false);
+      this.\_\_timer = setInterval(\_onTimeChange, interval);
+    }
+
+    return () => {
+      // 清除计时器
+      clearInterval(this.\_\_timer);
+    }
+  })
+} 
+
+export function Card (props) {
+  const {data, endTime} = props;
+  const \[expired, setExpired\] = useState(true);
+  const \[minute, setMinute\] = useState(0);
+  const \[second, setSecond\] = useState(0);
+
+  useTimer(endTime, 1000, ({expired, minute, second}) => {
+    setExpired(expired);
+    setMinute(minute);
+    setSecond(second);
+  });
+  return (...);
+```
+自定义Hook除了命名需要遵循规则，参数传入和返回结果都可以根据具体情况来定。
+
+这里，我在定时器每秒返回后传出了一个callback，把时分秒等参数传出。
+
+除此之外可以看到没有class的生命周期，使用`useEffect`来完成副作用的操作。
+
+### 约定
+
+使用一个`eslint-plugin-react-hooks` ESLint插件来强制执行这些规则
+
+1. 只在最顶层使用 Hook
+
+不要在`循环`，`条件`或`嵌套函数`中调用 Hook， 确保总是在React 函数的最顶层调用他们。
+
+因为React是根据你声明的顺序去调用hooks的，如果不在最顶层调用，那么不能保证每次渲染的顺序都是相同的。
+
+遵守规则，React 才能够在多次的 `useState` 和 `useEffect` 调用之间保持 hook 状态的正确。
+
+2. 只在 React 函数中调用 Hook
+    
+    - 在 React 的函数组件中调用 Hook
+        
+    - 在自定义 Hook 中调用其他 Hook
+        
+
+## 参考
+
+[React官方文档](https://reactjs.org/docs/hooks-intro.html)
+
+[Mixins Considered Harmful](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html)
+
+[深入浅出React高阶组件](https://zhuanlan.zhihu.com/p/28138664)
+
+[React 高阶组件(HOC)入门指南](https://juejin.im/post/5914fb4a0ce4630069d1f3f6)
+
+[Making Sense of React Hooks](https://medium.com/@dan_abramov/making-sense-of-react-hooks-fdbde8803889)

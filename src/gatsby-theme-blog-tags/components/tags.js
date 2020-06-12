@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { jsx, Styled, Box, Container, AspectImage, Avatar, Text, NavLink, Grid} from 'theme-ui'
+import { jsx, Styled, Box, Container, AspectImage, Avatar, Text, NavLink, Grid, Button, Flex} from 'theme-ui'
 import { Link, useStaticQuery, graphql } from 'gatsby'
 import { Layout } from 'gatsby-theme-ui-layout'
 
@@ -32,23 +32,27 @@ const {nodes} = data.allBlogPost;
       <Container sx={{display: 'flex', alignItems: 'center'}}>
         <Box py={40}>
           <Styled.h1>Archives</Styled.h1>
-          <Grid columns={3} gap={2}>
+          <Flex columns={4} gap={2}>
           {
             props.data.allBlogPost.group.map(item => (
-              <NavLink href={`/tags/${item.tag}`}><Text>#{item.tag}</Text></NavLink>
+              <NavLink href={`/tags/${item.tag}`}><Button color="text" sx={{ fontWeight: 'bold' }} mr={3} mb={3} bg="gray"># {item.tag}</Button></NavLink>
             ))
           }
+          </Flex>
+          <Grid columns={1} m={0} pb={20}>
+            {nodes.map(post => (
+              <>
+                <Link sx={{
+                  color: 'text',
+                  textDecoration: 'none',
+                  ':hover,:focus': {
+                    color: 'primary',
+                    textDecoration: 'underline',
+                  }}} to={post.slug}>{post.title}</Link>
+                <small sx={{ fontWeight: 'bold' }}>{post.date}</small>
+              </>
+            ))}
           </Grid>
-          <Grid columns={1}>
-          {
-            nodes.map(node => (
-              <Box>
-                <Text>{node.title}</Text>
-              </Box>
-            ))
-          }
-          </Grid>
-
         </Box>
       </Container>
       </Layout>
